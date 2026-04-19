@@ -1,175 +1,171 @@
-from flask import Flask, request
+from flask import Flask, request, render_template_string
 import requests
 import os
 
 app = Flask(__name__)
 
-API = os.environ.get("API_URL")
+# 🔐 API (Render environment variable)
+API_URL = os.environ.get("API")
 
-if not API:
-    raise Exception("API_URL not set!")
+if not API_URL:
+    raise Exception("API not set!")
 
-# 🔥 =========================
-# 🎯 CONTENT 1
-# 🔥 =========================
+BUY_LINK = "https://yourdomain.com/buy.html"
 
-CONTENT_1 = """ hi
 
-"""
+# =======================
+# 🔥 CONTENTS
+# =======================
 
-# 🔥 =========================
-# 🎯 CONTENT 2
-# 🔥 =========================
+CONTENT = {
+    "protectcontent-1": """<h2 style='color:#22c55e'>Unlocked Content 1 ✅</h2>
+    <p>এটা তোমার Premium Content 1</p>""",
 
-CONTENT_2 = """<!DOCTYPE html>
+    "protectcontent-2": """<h2 style='color:#22c55e'>Unlocked Content 2 ✅</h2>
+    <p>এটা তোমার Premium Content 2</p>"""
+}
+
+
+# =======================
+# 🔐 PASSWORD PAGE
+# =======================
+
+HTML_PAGE = """
+<!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Protected Content 2</title>
+<title>Protected</title>
+<style>
+body{
+  background:#0f172a;
+  color:#fff;
+  font-family:sans-serif;
+  text-align:center;
+  padding:50px;
+}
+input{
+  padding:10px;
+  border-radius:8px;
+  border:none;
+}
+button{
+  padding:10px 20px;
+  background:#22c55e;
+  border:none;
+  border-radius:8px;
+  color:#fff;
+  cursor:pointer;
+}
+</style>
 </head>
 
-<body style="background:#020617;color:#fff;font-family:sans-serif;padding:20px;">
+<body>
 
-<h2>🔓 Premium Content 2</h2>
-<p>এটা দ্বিতীয় content।</p>
+<h2>🔒 Enter Password</h2>
 
-</body>
-</html>
-"""
-
-# 🔥 =========================
-# 🏠 HOME
-# 🔥 =========================
-
-@app.route("/")
-def home():
-    item = request.args.get("item")
-
-    if not item:
-        return "No item provided ❌"
-
-    return f"""
-<html>
-<body style="background:#0f172a;color:#fff;text-align:center;padding-top:80px;font-family:sans-serif;">
-
-<h2>🔒 Unlock {item}</h2>
-
-<input type="password" id="pw" placeholder="Enter Password"
-style="padding:10px;border-radius:8px;border:none;margin:10px;">
-
-<br>
-
-<button onclick="go()" style="padding:10px 20px;border:none;border-radius:8px;
-background:#22c55e;color:#fff;cursor:pointer;">
-Unlock
-</button>
-
+<input type="password" id="pass" placeholder="Password">
 <br><br>
-
-<button id="buyBtn" style="display:none;padding:10px 20px;border:none;border-radius:8px;
-background:#ef4444;color:#fff;cursor:pointer;">
-Buy Now 💰
-</button>
+<button onclick="unlock()">Unlock</button>
 
 <script>
 let attempts = 0;
+const MAX = 3;
 
-async function go(){{
-    let pw = document.getElementById("pw").value;
+function unlock(){
 
-    let res = await fetch("/check?pass=" + encodeURIComponent(pw) + "&item={item}");
-    let text = await res.text();
+  let pass = document.getElementById("pass").value;
 
-    if(text === "OK"){{
-        window.location.href = "/content?item={item}&pass=" + encodeURIComponent(pw);
-    }}
-    else if(text === "LIMIT"){{
-        alert("Limit reached ❌");
-    }}
-    else{{
-        attempts++;
-        alert("Wrong Password ❌ (" + attempts + "/3)");
+  if(pass.trim() === "") return;
 
-        if(attempts >= 3){{
-            document.getElementById("buyBtn").style.display = "inline-block";
+  fetch("?item={{item}}&pass=" + encodeURIComponent(pass))
+  .then(res => res.text())
+  .then(data => {
 
-            setTimeout(()=>{{
-                window.location.href = "/buy";
-            }}, 1500);
-        }}
-    }}
-}}
+    if(data === "OK"){
+      location.href = "?item={{item}}&unlock=1&pass=" + pass;
+    }
+    else if(data === "LIMIT"){
+      alert("Limit Reached!");
+      location.href = "{{buy}}";
+    }
+    else{
+      attempts++;
+      alert("Wrong Password (" + attempts + "/" + MAX + ")");
+
+      if(attempts >= MAX){
+        location.href = "{{buy}}";
+      }
+    }
+
+  });
+
+}
 </script>
 
 </body>
 </html>
 """
 
-# 🔍 =========================
-# CHECK PASSWORD
-# =========================
 
-@app.route("/check")
-def check():
-    pw = request.args.get("pass")
+# =======================
+# 🚀 MAIN ROUTE
+# =======================
+
+@app.route("/")
+def home():
+
     item = request.args.get("item")
+    password = request.args.get("pass")
+    unlock = request.args.get("unlock")
 
+    # ❌ No item
+    if not item:
+        return "No item provided ❌"
+
+    # 🔒 Step 1: show password page
+    if not password:
+        return render_template_string(HTML_PAGE, item=item, buy=BUY_LINK)
+
+    # 🔗 API CALL (Sheet check)
     try:
-        res = requests.get(API + f"?pass={pw}&url={item}")
-        return res.text.strip()
-    except:
-        return "ERROR"
+        res = requests.get(API_URL, params={
+            "pass": password,
+            "url": item   # 🔥 IMPORTANT (protectcontent-1)
+        })
 
-# 🔒 =========================
-# CONTENT ROUTE
-# =========================
-
-@app.route("/content")
-def content():
-    item = request.args.get("item")
-    pw = request.args.get("pass")
-
-    if not pw:
-        return "Access Denied ❌"
-
-    try:
-        res = requests.get(API + f"?pass={pw}&url={item}")
         result = res.text.strip()
+
     except:
-        return "Server Error ❌"
+        return "API Error ❌"
 
-    if result != "OK":
-        return "Access Denied ❌"
+    # ❌ Wrong password
+    if result == "WRONG":
+        return "WRONG"
 
-    if item == "protectcontent-1":
-        return CONTENT_1
+    # ❌ Limit reached
+    if result == "LIMIT":
+        return "LIMIT"
 
-    elif item == "protectcontent-2":
-        return CONTENT_2
+    # ✅ Correct password → unlock
+    if result == "OK":
 
-    return "Invalid Item ❌"
+        if unlock == "1":
 
-# 💰 =========================
-# BUY PAGE
-# =========================
+            content = CONTENT.get(item)
 
-@app.route("/buy")
-def buy():
-    return """
-<html style="background:#0f172a;color:white;text-align:center;padding-top:100px;">
-<h1>🔓 Unlock Full Access</h1>
+            if content:
+                return content
+            else:
+                return "No content found ❌"
 
-<a href="https://your-payment-link.com"
-style="padding:12px 25px;background:#22c55e;color:white;border-radius:8px;text-decoration:none;">
-Buy Now 💰
-</a>
+        return "OK"
 
-</html>
-"""
+    return "Error ❌"
 
-# 🚀 =========================
-# RUN
-# =========================
+
+# =======================
+# 🚀 RUN
+# =======================
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))

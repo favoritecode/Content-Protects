@@ -4,13 +4,12 @@ import os
 
 app = Flask(__name__)
 
-# 🔐 ENV থেকে API নেওয়া
 API = os.environ.get("API_URL")
 
 if not API:
     raise Exception("API_URL not set!")
 
-# 🏠 HOME (Password UI)
+# 🏠 HOME
 @app.route("/")
 def home():
     item = request.args.get("item")
@@ -48,11 +47,11 @@ def home():
         else if(text === "LIMIT"){{
             alert("❌ Limit reached!");
         }}
-        else if(text === "ERROR"){{
-            alert("Server error ❌");
+        else if(text === "WRONG"){{
+            alert("Wrong Password ❌");
         }}
         else{{
-            alert("Wrong Password ❌");
+            alert("Error ❌");
         }}
     }}
     </script>
@@ -62,20 +61,21 @@ def home():
     """
 
 
-# 🔍 PASSWORD CHECK (Apps Script)
+# 🔍 CHECK PASSWORD
 @app.route("/check")
 def check():
     pw = request.args.get("pass")
     item = request.args.get("item")
 
     try:
-        res = requests.get(API + f"?pass={pw}&item={item}")
+        # 🔥 IMPORTANT: item → url
+        res = requests.get(API + f"?pass={pw}&url={item}")
         return res.text.strip()
     except:
         return "ERROR"
 
 
-# 🔒 LOCKED CONTENT
+# 🔒 CONTENT
 @app.route("/content")
 def content():
     item = request.args.get("item")
@@ -85,7 +85,7 @@ def content():
         return "Access Denied ❌"
 
     try:
-        res = requests.get(API + f"?pass={pw}&item={item}")
+        res = requests.get(API + f"?pass={pw}&url={item}")
         result = res.text.strip()
     except:
         return "Server Error ❌"
@@ -93,7 +93,7 @@ def content():
     if result != "OK":
         return "Access Denied ❌"
 
-    # 🎬 CONTENT AREA (এখানে নিজের content বসাবি)
+    # 🎬 CONTENT
     if item == "video1":
         return """
         <html style="background:black;color:white;">

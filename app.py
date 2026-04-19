@@ -4,58 +4,25 @@ import os
 
 app = Flask(__name__)
 
-# 🔐 API (Render environment variable)
 API_URL = os.environ.get("API")
-
-if not API_URL:
-    raise Exception("API not set!")
-
 BUY_LINK = "https://yourdomain.com/buy.html"
 
-
-# =======================
-# 🔥 CONTENTS
-# =======================
-
+# 🔥 Content map
 CONTENT = {
-    "protectcontent-1": """<h2 style='color:#22c55e'>Unlocked Content 1 ✅</h2>
-    <p>এটা তোমার Premium Content 1</p>""",
-
-    "protectcontent-2": """<h2 style='color:#22c55e'>Unlocked Content 2 ✅</h2>
-    <p>এটা তোমার Premium Content 2</p>"""
+    "protectcontent-1": "<h2>Unlocked Content 1 ✅</h2><p>Premium Data 1</p>",
+    "protectcontent-2": "<h2>Unlocked Content 2 ✅</h2><p>Premium Data 2</p>"
 }
 
-
-# =======================
-# 🔐 PASSWORD PAGE
-# =======================
-
-HTML_PAGE = """
+# 🔐 Password page
+HTML = """
 <!DOCTYPE html>
 <html>
 <head>
 <title>Protected</title>
 <style>
-body{
-  background:#0f172a;
-  color:#fff;
-  font-family:sans-serif;
-  text-align:center;
-  padding:50px;
-}
-input{
-  padding:10px;
-  border-radius:8px;
-  border:none;
-}
-button{
-  padding:10px 20px;
-  background:#22c55e;
-  border:none;
-  border-radius:8px;
-  color:#fff;
-  cursor:pointer;
-}
+body{background:#0f172a;color:#fff;text-align:center;padding:50px;font-family:sans-serif;}
+input{padding:10px;border-radius:8px;border:none;}
+button{padding:10px 20px;background:#22c55e;border:none;border-radius:8px;color:#fff;}
 </style>
 </head>
 
@@ -63,42 +30,42 @@ button{
 
 <h2>🔒 Enter Password</h2>
 
-<input type="password" id="pass" placeholder="Password">
+<input type="password" id="p">
 <br><br>
-<button onclick="unlock()">Unlock</button>
+<button onclick="go()">Unlock</button>
+
+<br><br>
+<a href="{{buy}}" style="color:#fff;background:red;padding:10px 20px;border-radius:8px;text-decoration:none;">
+Buy Access
+</a>
 
 <script>
-let attempts = 0;
-const MAX = 3;
+let tries = 0;
 
-function unlock(){
-
-  let pass = document.getElementById("pass").value;
-
-  if(pass.trim() === "") return;
+function go(){
+  let pass = document.getElementById("p").value;
 
   fetch("?item={{item}}&pass=" + encodeURIComponent(pass))
-  .then(res => res.text())
-  .then(data => {
+  .then(r=>r.text())
+  .then(t=>{
 
-    if(data === "OK"){
-      location.href = "?item={{item}}&unlock=1&pass=" + pass;
+    if(t === "OK"){
+      location.href = "?item={{item}}&pass="+pass+"&unlock=1";
     }
-    else if(data === "LIMIT"){
+    else if(t === "LIMIT"){
       alert("Limit Reached!");
-      location.href = "{{buy}}";
+      location.href="{{buy}}";
     }
     else{
-      attempts++;
-      alert("Wrong Password (" + attempts + "/" + MAX + ")");
+      tries++;
+      alert("Wrong Password ("+tries+"/3)");
 
-      if(attempts >= MAX){
-        location.href = "{{buy}}";
+      if(tries>=3){
+        location.href="{{buy}}";
       }
     }
 
   });
-
 }
 </script>
 
@@ -106,66 +73,48 @@ function unlock(){
 </html>
 """
 
-
-# =======================
-# 🚀 MAIN ROUTE
-# =======================
-
 @app.route("/")
 def home():
 
-    item = request.args.get("item")
-    password = request.args.get("pass")
+    item = request.args.get("item", "").strip()
+    password = request.args.get("pass", "").strip()
     unlock = request.args.get("unlock")
 
-    # ❌ No item
     if not item:
-        return "No item provided ❌"
+        return "No item ❌"
 
-    # 🔒 Step 1: show password page
+    # 🔒 show password page
     if not password:
-        return render_template_string(HTML_PAGE, item=item, buy=BUY_LINK)
+        return render_template_string(HTML, item=item, buy=BUY_LINK)
 
-    # 🔗 API CALL (Sheet check)
+    # 🔗 API call
     try:
         res = requests.get(API_URL, params={
             "pass": password,
-            "url": item   # 🔥 IMPORTANT (protectcontent-1)
+            "url": item
         })
-
         result = res.text.strip()
-
     except:
-        return "API Error ❌"
+        return "API ERROR ❌"
 
-    # ❌ Wrong password
+    # ❌ wrong
     if result == "WRONG":
         return "WRONG"
 
-    # ❌ Limit reached
+    # ❌ limit
     if result == "LIMIT":
         return "LIMIT"
 
-    # ✅ Correct password → unlock
+    # ✅ correct
     if result == "OK":
 
         if unlock == "1":
-
-            content = CONTENT.get(item)
-
-            if content:
-                return content
-            else:
-                return "No content found ❌"
+            return CONTENT.get(item, "No content ❌")
 
         return "OK"
 
-    return "Error ❌"
+    return "ERROR ❌"
 
-
-# =======================
-# 🚀 RUN
-# =======================
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))

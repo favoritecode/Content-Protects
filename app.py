@@ -6,7 +6,7 @@ import time
 app = Flask(__name__)
 
 # 🔐 API (Render ENV)
-API_URL = os.environ.get("API")
+API_URL = os.environ.get("API_URL")
 
 if not API_URL:
     raise Exception("API not set!")

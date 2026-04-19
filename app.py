@@ -1,12 +1,16 @@
 from flask import Flask, request, make_response
 import requests
+import os
 
 app = Flask(__name__)
 
-# 🔥 Google Apps Script API
-API = "https://script.google.com/macros/s/AKfycbyRZJmnuacUBY1bIKzv0dU91iH_ScpIfBZrG9vyAG-nOGlvVKtQMz7bN9Sv0jc7ikANeA/exec"
+# 🔐 ENV থেকে API নেওয়া
+API = os.environ.get("API_URL")
 
+if not API:
+    raise Exception("API_URL not set!")
 
+# 🏠 HOME (Password UI)
 @app.route("/")
 def home():
     item = request.args.get("item")
@@ -44,6 +48,9 @@ def home():
         else if(text === "LIMIT"){{
             alert("❌ Limit reached!");
         }}
+        else if(text === "ERROR"){{
+            alert("Server error ❌");
+        }}
         else{{
             alert("Wrong Password ❌");
         }}
@@ -55,7 +62,7 @@ def home():
     """
 
 
-# 🔍 PASSWORD CHECK (Apps Script call)
+# 🔍 PASSWORD CHECK (Apps Script)
 @app.route("/check")
 def check():
     pw = request.args.get("pass")
@@ -63,12 +70,12 @@ def check():
 
     try:
         res = requests.get(API + f"?pass={pw}&item={item}")
-        return res.text
+        return res.text.strip()
     except:
         return "ERROR"
 
 
-# 🔥 LOCKED CONTENT
+# 🔒 LOCKED CONTENT
 @app.route("/content")
 def content():
     item = request.args.get("item")
@@ -77,29 +84,32 @@ def content():
     if not pw:
         return "Access Denied ❌"
 
-    # আবার verify (extra security)
     try:
         res = requests.get(API + f"?pass={pw}&item={item}")
-        result = res.text
+        result = res.text.strip()
     except:
         return "Server Error ❌"
 
     if result != "OK":
         return "Access Denied ❌"
 
-    # 🎬 CONTENT AREA (EDIT HERE 👇)
+    # 🎬 CONTENT AREA (এখানে নিজের content বসাবি)
     if item == "video1":
         return """
-        <h1 style='color:white;text-align:center'>🎬 Video 1</h1>
+        <html style="background:black;color:white;">
+        <h1 style="text-align:center;">🎬 Video 1</h1>
         <iframe src="https://example.com/video1"
         width="100%" height="500" style="border:none;"></iframe>
+        </html>
         """
 
     elif item == "video2":
         return """
-        <h1 style='color:white;text-align:center'>🎬 Video 2</h1>
+        <html style="background:black;color:white;">
+        <h1 style="text-align:center;">🎬 Video 2</h1>
         <iframe src="https://example.com/video2"
         width="100%" height="500" style="border:none;"></iframe>
+        </html>
         """
 
     else:
@@ -107,7 +117,6 @@ def content():
 
 
 # 🔥 Render fix
-import os
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)

@@ -5,16 +5,16 @@ import time
 
 app = Flask(__name__)
 
-# ✅ API ঠিক নাম
+# ✅ API ENV
 API_URL = os.environ.get("API_URL")
 
 if not API_URL:
     raise Exception("API_URL not set!")
 
-BUY_LINK = "https://yourdomain.com/buy.html"
+BUY_LINK = "https://www.favoriteweb.net/2026/04/buy-premium-blogger-scripts-source-code.html"
 
 # =========================
-# 🎯 CONTENT (এখানে তোর content দিবি)
+# 🎯 CONTENT (EDIT HERE)
 # =========================
 
 CONTENT = {
@@ -425,11 +425,11 @@ async function downloadZip(){
 
     """,
 
-    "protectcontent-2": "<h2 style='color:white'>Content 2</h2>"
+    "protectcontent-2": "<h2 style='padding:20px'>Content 2</h2>"
 }
 
 # =========================
-# 🔐 PASSWORD PAGE
+# 🔐 PASSWORD PAGE (WHITE UI)
 # =========================
 
 HTML = """
@@ -437,28 +437,87 @@ HTML = """
 <html>
 <head>
 <title>Protected</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
-body{background:#0f172a;color:#fff;text-align:center;padding:50px;font-family:sans-serif;}
-input{padding:10px;border-radius:8px;border:none;}
-button{padding:10px 20px;background:#22c55e;border:none;border-radius:8px;color:#fff;}
+body{
+  margin:0;
+  padding:0;
+  background:#f1f5f9;
+  font-family:'Segoe UI',sans-serif;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+.box{
+  background:#fff;
+  padding:30px;
+  border-radius:16px;
+  width:90%;
+  max-width:400px;
+  text-align:center;
+  box-shadow:0 10px 30px rgba(0,0,0,0.08);
+}
+
+h2{
+  margin-bottom:20px;
+  color:#0f172a;
+}
+
+input{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #e2e8f0;
+  outline:none;
+}
+
+input:focus{
+  border-color:#6366f1;
+  box-shadow:0 0 0 3px rgba(99,102,241,0.15);
+}
+
+button{
+  width:100%;
+  padding:12px;
+  margin-top:15px;
+  border:none;
+  border-radius:10px;
+  background:linear-gradient(135deg,#6366f1,#22c55e);
+  color:#fff;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.buy{
+  display:block;
+  margin-top:15px;
+  padding:10px;
+  background:#ef4444;
+  color:#fff;
+  border-radius:10px;
+  text-decoration:none;
+}
 </style>
+
 </head>
 
 <body>
 
+<div class="box">
+
 <h2>🔒 Enter Password</h2>
 
 <input type="password" id="p" placeholder="Enter password">
-<br><br>
+
 <button onclick="go()">Unlock</button>
 
-<br><br>
+<a href="{{buy}}" target="_top" class="buy">Buy Access</a>
 
-<!-- ✅ Buy button only top redirect -->
-<a href="{{buy}}" target="_top"
-style="background:red;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;">
-Buy Now 💰
-</a>
+</div>
 
 <script>
 let tries = 0;
@@ -474,7 +533,6 @@ function go(){
   .then(t=>{
 
     if(t === "OK"){
-      // ✅ iframe এর ভিতরেই থাকবে
       window.location.href = "?item={{item}}&pass="+encodeURIComponent(pass)+"&unlock=1";
     }
     else if(t === "LIMIT"){
@@ -513,11 +571,9 @@ def home():
     if not item:
         return "No item ❌"
 
-    # 🔒 password page
     if not password:
         return render_template_string(HTML, item=item, buy=BUY_LINK)
 
-    # 🔥 API call
     try:
         res = requests.get(API_URL, params={
             "pass": password,
@@ -528,20 +584,15 @@ def home():
     except:
         return "API ERROR ❌"
 
-    # ❌ wrong
     if result == "WRONG":
         return "WRONG"
 
-    # ❌ limit
     if result == "LIMIT":
         return "LIMIT"
 
-    # ✅ success
     if result == "OK":
-
         if unlock == "1":
             return CONTENT.get(item, "No content ❌")
-
         return "OK"
 
     return "ERROR ❌"

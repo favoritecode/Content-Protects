@@ -447,7 +447,7 @@ body{
   display:flex;
   justify-content:center;
   align-items:center;
-  height:100vh;
+  height:60vh;
 }
 
 .box{
@@ -466,10 +466,10 @@ h2{
 }
 
 input{
-  width:100%;
+  width:93%;
   padding:12px;
   border-radius:10px;
-  border:1px solid #e2e8f0;
+  border:1px solid #006dff;
   outline:none;
 }
 

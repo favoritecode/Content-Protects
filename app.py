@@ -29,18 +29,46 @@ CONTENT = {
 <div style="position:relative;background:#0f172a;color:#fff;padding:15px;border-radius:12px;margin-top:10px;">
 
 <button onclick="(function(btn){
+
   var text = document.getElementById('box_xv08iw').innerText;
-  navigator.clipboard.writeText(text);
 
-  btn.innerText = 'Copied!';
-  btn.style.background = '#16a34a';
+  function success(){
+    btn.innerText = 'Copied!';
+    btn.style.background = '#16a34a';
 
-  setTimeout(function(){
-    btn.innerText = 'Copy';
-    btn.style.background = '#22c55e';
-  }, 5000);
+    setTimeout(function(){
+      btn.innerText = 'Copy';
+      btn.style.background = '#22c55e';
+    }, 5000);
+  }
+
+  // 🔥 Try modern method
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(text)
+    .then(success)
+    .catch(function(){
+      fallback();
+    });
+  } else {
+    fallback();
+  }
+
+  // 🔥 fallback (iframe compatible)
+  function fallback(){
+    var textarea = document.createElement("textarea");
+    textarea.value = text;
+    document.body.appendChild(textarea);
+
+    textarea.select();
+    document.execCommand("copy");
+
+    document.body.removeChild(textarea);
+
+    success();
+  }
 
 })(this)"
+
 style="position:absolute;top:10px;right:10px;background:#22c55e;border:none;padding:5px 10px;border-radius:6px;color:#fff;cursor:pointer;">
 Copy
 </button>

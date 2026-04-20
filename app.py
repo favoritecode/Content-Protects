@@ -5,7 +5,7 @@ import time
 
 app = Flask(__name__)
 
-# ✅ ENV ঠিক নাম
+# ✅ API ঠিক নাম
 API_URL = os.environ.get("API_URL")
 
 if not API_URL:
@@ -14,7 +14,7 @@ if not API_URL:
 BUY_LINK = "https://yourdomain.com/buy.html"
 
 # =========================
-# 🎯 CONTENT (EDIT HERE)
+# 🎯 CONTENT (এখানে তোর content দিবি)
 # =========================
 
 CONTENT = {
@@ -425,11 +425,7 @@ async function downloadZip(){
 
     """,
 
-    "protectcontent-2": """
-    <div style="color:white;padding:20px">
-        <h2>🔓 Premium Content 2</h2>
-    </div>
-    """
+    "protectcontent-2": "<h2 style='color:white'>Content 2</h2>"
 }
 
 # =========================
@@ -444,7 +440,7 @@ HTML = """
 <style>
 body{background:#0f172a;color:#fff;text-align:center;padding:50px;font-family:sans-serif;}
 input{padding:10px;border-radius:8px;border:none;}
-button{padding:10px 20px;background:#22c55e;border:none;border-radius:8px;color:#fff;cursor:pointer;}
+button{padding:10px 20px;background:#22c55e;border:none;border-radius:8px;color:#fff;}
 </style>
 </head>
 
@@ -458,6 +454,7 @@ button{padding:10px 20px;background:#22c55e;border:none;border-radius:8px;color:
 
 <br><br>
 
+<!-- ✅ Buy button only top redirect -->
 <a href="{{buy}}" target="_top"
 style="background:red;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;">
 Buy Now 💰
@@ -477,7 +474,8 @@ function go(){
   .then(t=>{
 
     if(t === "OK"){
-      window.top.location.href = "?item={{item}}&pass="+encodeURIComponent(pass)+"&unlock=1";
+      // ✅ iframe এর ভিতরেই থাকবে
+      window.location.href = "?item={{item}}&pass="+encodeURIComponent(pass)+"&unlock=1";
     }
     else if(t === "LIMIT"){
       alert("Limit Reached!");
@@ -515,32 +513,30 @@ def home():
     if not item:
         return "No item ❌"
 
-    # 🔒 show password page
+    # 🔒 password page
     if not password:
         return render_template_string(HTML, item=item, buy=BUY_LINK)
 
-    # 🔥 API CALL (SAFE + NO CACHE)
+    # 🔥 API call
     try:
         res = requests.get(API_URL, params={
             "pass": password,
             "url": item,
             "t": int(time.time())
         })
-
         result = res.text.strip()
-
     except:
         return "API ERROR ❌"
 
-    # ❌ WRONG
+    # ❌ wrong
     if result == "WRONG":
         return "WRONG"
 
-    # ❌ LIMIT
+    # ❌ limit
     if result == "LIMIT":
         return "LIMIT"
 
-    # ✅ OK
+    # ✅ success
     if result == "OK":
 
         if unlock == "1":
@@ -549,7 +545,6 @@ def home():
         return "OK"
 
     return "ERROR ❌"
-
 
 # =========================
 # 🚀 RUN

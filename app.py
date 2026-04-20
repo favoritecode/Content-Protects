@@ -442,7 +442,6 @@ HTML = """
 body{
   margin:0;
   padding:0;
-  background:#f1f5f9;
   font-family:'Segoe UI',sans-serif;
   display:flex;
   justify-content:center;
@@ -498,6 +497,11 @@ button{
   color:#fff;
   border-radius:10px;
   text-decoration:none;
+}
+@media only screen and (max-width: 600px) {
+  input{
+  width:90%;
+  }
 }
 </style>
 

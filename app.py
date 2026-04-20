@@ -19,9 +19,7 @@ BUY_LINK = "https://www.favoriteweb.net/2026/04/buy-premium-blogger-scripts-sour
 
 CONTENT = {
     "protectcontent-1": """
-    <div class="separator" style="clear: both;"><a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgSFkBfiy6kta8VuX4jbziCsw8ViCiVGsooqb17T9bWhX2UkPqAZzqigyPLo0w5WeXg1riBnWPcfygoP_pXcrBOjsASqN1wmNdCr1UV5znQKoGPMx9YKxaJR9MKpUm4iv8FZWAirG0nDZcMTZQWCPej39OzCQ0Ef1XWizuGRFEzCOjVLgrLM0Yp8V-tOJA/s1600/QR%20Code%20Generator%20Script%20and%20Guide%20-%20Favorite%20Web.png" style="display: block; padding: 1em 0; text-align: center; "><img alt="" border="0" data-original-height="1024" data-original-width="1536" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgSFkBfiy6kta8VuX4jbziCsw8ViCiVGsooqb17T9bWhX2UkPqAZzqigyPLo0w5WeXg1riBnWPcfygoP_pXcrBOjsASqN1wmNdCr1UV5znQKoGPMx9YKxaJR9MKpUm4iv8FZWAirG0nDZcMTZQWCPej39OzCQ0Ef1XWizuGRFEzCOjVLgrLM0Yp8V-tOJA/s1600/QR%20Code%20Generator%20Script%20and%20Guide%20-%20Favorite%20Web.png"/></a></div>
-
-<h2>Usage Guide</h2>
+    <h2>Usage Guide</h2>
 <div style="text-align:justify">এই Code গুলো ব্যাবহার করে Advance Single এবং Bulk QR কোড তৈরী করা একদম সহজ with Custom Title. কারণ নিচের Code গুলো আপনার পোস্ট/পেইজে Copy করে Past করলে‘ই আপনার QR Code Generator Tools Ready. এরপর শুধু Title থেকে নাম পরিবর্তন এবং JS Code থেকে Zip এর নাম পরিবর্তন করলেই নিজস্ব Branding এ আপনার QR Code Generator Tools সম্পূর্ণ প্রস্তুত।</div>
 
 <h2>HTML Code</h2>

@@ -42,29 +42,35 @@ CONTENT = {
     }, 5000);
   }
 
-  // 🔥 Try modern method
-  if(navigator.clipboard){
-    navigator.clipboard.writeText(text)
-    .then(success)
-    .catch(function(){
-      fallback();
-    });
-  } else {
-    fallback();
-  }
-
-  // 🔥 fallback (iframe compatible)
   function fallback(){
-    var textarea = document.createElement("textarea");
+    var textarea = document.createElement('textarea');
     textarea.value = text;
-    document.body.appendChild(textarea);
 
+    // 🔥 important fixes
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+
+    document.body.appendChild(textarea);
+    textarea.focus();
     textarea.select();
-    document.execCommand("copy");
+
+    try {
+      document.execCommand('copy');
+      success();
+    } catch(err){
+      alert("Copy failed 😢");
+    }
 
     document.body.removeChild(textarea);
+  }
 
-    success();
+  // 🔥 try modern
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text)
+      .then(success)
+      .catch(fallback);
+  } else {
+    fallback();
   }
 
 })(this)"

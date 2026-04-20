@@ -444,6 +444,7 @@ body{
   padding:0;
   font-family:'Segoe UI',sans-serif;
   display:flex;
+  overflow:hidden;
   justify-content:center;
   align-items:center;
   height:60vh;

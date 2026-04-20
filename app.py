@@ -24,7 +24,7 @@ CONTENT = {
 
 <h2>HTML Code</h2>
 
-<div style="position:relative;background:#0f172a;color:#fff;padding:15px;border-radius:12px;margin-top:10px;">
+<div style="position:relative;background:#0f172a;color:#fff;padding:15px;border-radius:12px;margin-top:10px;overflow:hidden;">
 
 <button onclick="(function(btn){
   var text = document.getElementById('box_xv08iw').innerText;
@@ -69,7 +69,7 @@ Copy
 <br/><br/>
 <h2>CSS Code</h2>
 
-<div style="position:relative;background:#0f172a;color:#fff;padding:15px;border-radius:12px;margin-top:10px;">
+<div style="position:relative;background:#0f172a;color:#fff;padding:15px;border-radius:12px;margin-top:10px;overflow:hidden;">
 
 <button onclick="(function(btn){
   var text = document.getElementById('box_8k112a').innerText;
@@ -191,7 +191,7 @@ Copy
 <br/><br/>
 <h2>JS Code</h2>
 
-<div style="position:relative;background:#0f172a;color:#fff;padding:15px;border-radius:12px;margin-top:10px;">
+<div style="position:relative;background:#0f172a;color:#fff;padding:15px;border-radius:12px;margin-top:10px;overflow:hidden;">
 
 <button onclick="(function(btn){
   var text = document.getElementById('box_85f8py').innerText;
@@ -444,7 +444,6 @@ body{
   padding:0;
   font-family:'Segoe UI',sans-serif;
   display:flex;
-  overflow:hidden;
   justify-content:center;
   align-items:center;
   height:60vh;

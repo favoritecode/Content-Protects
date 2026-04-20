@@ -5,16 +5,16 @@ import time
 
 app = Flask(__name__)
 
-# 🔐 API (Render ENV)
+# ✅ ENV ঠিক নাম
 API_URL = os.environ.get("API_URL")
 
 if not API_URL:
-    raise Exception("API not set!")
+    raise Exception("API_URL not set!")
 
 BUY_LINK = "https://yourdomain.com/buy.html"
 
 # =========================
-# 🎯 CONTENT (PASTE HERE)
+# 🎯 CONTENT (EDIT HERE)
 # =========================
 
 CONTENT = {
@@ -29,52 +29,18 @@ CONTENT = {
 <div style="position:relative;background:#0f172a;color:#fff;padding:15px;border-radius:12px;margin-top:10px;">
 
 <button onclick="(function(btn){
-
   var text = document.getElementById('box_xv08iw').innerText;
+  navigator.clipboard.writeText(text);
 
-  function success(){
-    btn.innerText = 'Copied!';
-    btn.style.background = '#16a34a';
+  btn.innerText = 'Copied!';
+  btn.style.background = '#16a34a';
 
-    setTimeout(function(){
-      btn.innerText = 'Copy';
-      btn.style.background = '#22c55e';
-    }, 5000);
-  }
-
-  function fallback(){
-    var textarea = document.createElement('textarea');
-    textarea.value = text;
-
-    // 🔥 important fixes
-    textarea.style.position = 'fixed';
-    textarea.style.opacity = '0';
-
-    document.body.appendChild(textarea);
-    textarea.focus();
-    textarea.select();
-
-    try {
-      document.execCommand('copy');
-      success();
-    } catch(err){
-      alert("Copy failed 😢");
-    }
-
-    document.body.removeChild(textarea);
-  }
-
-  // 🔥 try modern
-  if(navigator.clipboard && window.isSecureContext){
-    navigator.clipboard.writeText(text)
-      .then(success)
-      .catch(fallback);
-  } else {
-    fallback();
-  }
+  setTimeout(function(){
+    btn.innerText = 'Copy';
+    btn.style.background = '#22c55e';
+  }, 5000);
 
 })(this)"
-
 style="position:absolute;top:10px;right:10px;background:#22c55e;border:none;padding:5px 10px;border-radius:6px;color:#fff;cursor:pointer;">
 Copy
 </button>
@@ -476,26 +442,9 @@ HTML = """
 <head>
 <title>Protected</title>
 <style>
-body{
-  background:#0f172a;
-  color:#fff;
-  text-align:center;
-  padding:50px;
-  font-family:sans-serif;
-}
-input{
-  padding:10px;
-  border-radius:8px;
-  border:none;
-}
-button{
-  padding:10px 20px;
-  background:#22c55e;
-  border:none;
-  border-radius:8px;
-  color:#fff;
-  cursor:pointer;
-}
+body{background:#0f172a;color:#fff;text-align:center;padding:50px;font-family:sans-serif;}
+input{padding:10px;border-radius:8px;border:none;}
+button{padding:10px 20px;background:#22c55e;border:none;border-radius:8px;color:#fff;cursor:pointer;}
 </style>
 </head>
 
@@ -508,8 +457,10 @@ button{
 <button onclick="go()">Unlock</button>
 
 <br><br>
-<a href="{{buy}}" style="background:red;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;">
-Buy Access
+
+<a href="{{buy}}" target="_top"
+style="background:red;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;">
+Buy Now 💰
 </a>
 
 <script>
@@ -526,18 +477,18 @@ function go(){
   .then(t=>{
 
     if(t === "OK"){
-      location.href = "?item={{item}}&pass="+encodeURIComponent(pass)+"&unlock=1";
+      window.top.location.href = "?item={{item}}&pass="+encodeURIComponent(pass)+"&unlock=1";
     }
     else if(t === "LIMIT"){
       alert("Limit Reached!");
-      location.href="{{buy}}";
+      window.top.location.href="{{buy}}";
     }
     else{
       tries++;
       alert("Wrong Password ("+tries+"/3)");
 
       if(tries>=3){
-        location.href="{{buy}}";
+        window.top.location.href="{{buy}}";
       }
     }
 
@@ -564,21 +515,21 @@ def home():
     if not item:
         return "No item ❌"
 
-    # 🔒 password page
+    # 🔒 show password page
     if not password:
         return render_template_string(HTML, item=item, buy=BUY_LINK)
 
-    # 🔥 API CALL (FIXED + SAFE)
+    # 🔥 API CALL (SAFE + NO CACHE)
     try:
         res = requests.get(API_URL, params={
             "pass": password,
             "url": item,
-            "t": int(time.time())   # cache bypass
+            "t": int(time.time())
         })
 
         result = res.text.strip()
 
-    except Exception as e:
+    except:
         return "API ERROR ❌"
 
     # ❌ WRONG
@@ -598,6 +549,7 @@ def home():
         return "OK"
 
     return "ERROR ❌"
+
 
 # =========================
 # 🚀 RUN
